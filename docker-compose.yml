@@ -1,0 +1,63 @@
+version: "2"
+services:
+  mysqldb:
+    container_name: "mysqldb"
+    image: stefanlehmann/hybris-mysql:latest 
+    environment:
+      - MYSQL_DATABASE=hybriscommerce
+      - MYSQL_USER=hybris
+      - MYSQL_PASSWORD=hybris
+      - MYSQL_ROOT_PASSWORD=hybris
+    ports:
+      - 3306:3306
+    networks:
+      - hybrisnet
+  myhybris:
+    container_name: "hybris"
+    image: stefanlehmann/hybris-base-image:latest
+    environment:
+      - HYBRIS_DB_URL=mysqldb:3306
+      - HYBRIS_DB_DRIVER=com.mysql.jdbc.Driver
+      - HYBRIS_DB_USER=hybris
+      - HYBRIS_DB_PASSWORD=hybris
+      - HYBRIS_DB_FRACTIONAL=true
+      - HYBRIS_UPDATE_SYSTEM=no
+    depends_on:
+      - "mysqldb"
+    volumes:
+      - //c/Users/Aghebreab/Desktop/docker/data/hybris/hybris-commerce-suite-5.6.0.4-atd:/home/hybris
+    ports:
+      - 9001:9001
+      - 9002:9002
+      - 8983:8983
+      - 8000:8000
+    networks:
+      - hybrisnet
+  myphpadmin:
+    container_name: "phpmyadmin"
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=secrete
+      - MYSQL_USER=hybris
+      - MYSQL_PASSWORD=hybris
+      - PMA_HOST=mysqldb
+      - PMA_PORT=3306
+      - PMA_ARBITRARY=1
+    depends_on:
+      - "mysqldb"
+    ports:
+      - 8183:80
+    networks:
+      - hybrisnet
+  maildev:
+    container_name: "maildev"
+    image: ducatel/maildev-alpine:latest
+    ports:
+      - 1080:1080 
+      - 1025:1025
+    networks:
+      - hybrisnet      
+networks:
+    hybrisnet:
+      driver: bridge
