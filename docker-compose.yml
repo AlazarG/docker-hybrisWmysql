@@ -25,7 +25,7 @@ services:
     depends_on:
       - "mysqldb"
     volumes:
-      - //c/Users/Aghebreab/Desktop/docker/data/hybris/hybris-commerce-suite-5.6.0.4-atd:/home/hybris
+      - //c/dev/hybris62:/home/hybris
     ports:
       - 9001:9001
       - 9002:9002
